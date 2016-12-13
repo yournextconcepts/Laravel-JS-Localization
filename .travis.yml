@@ -6,7 +6,7 @@ php:
   - '7.0'
   - hhvm
 
-# Optimize the build since we are `composer installing` for each supported
+# Optimize the build since we are `composer install`ing for each supported
 # Laravel versions (see composer.json, under scripts sections).
 cache:
   directories:
