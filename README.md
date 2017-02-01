@@ -12,18 +12,19 @@
 [![License](https://poser.pugx.org/mariuzzo/laravel-js-localization/license.svg)](https://packagist.org/packages/mariuzzo/laravel-js-localization)
 [![Join the chat at https://gitter.im/rmariuzzo/Laravel-JS-Localization](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rmariuzzo/Laravel-JS-Localization?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This package convert all your localization messages from your Laravel app to JavaScript with a small library to interact with those messages following a very similar syntax you are familiar with.
+This package convert all your localization messages from your Laravel app to JavaScript with an optional small library to interact with those messages following a very familiar syntax.
 
 ### Features
 
- - Support Laravel 4.2.x, Laravel 5.0.x, Laravel 5.1.x, Laravel 5.2.x and Laravel 5.3.x.
- - Includes [Lang.js](https://github.com/rmariuzzo/lang.js) (a thin library highly inspired on Laravel's [`Translator`](https://laravel.com/api/5.3/Illuminate/Translation/Translator.html) class).
- - Allow to specify desired lang files to be converted to JS.
- - Lang.js API is based on Laravel's [`Translator`](https://laravel.com/api/5.3/Illuminate/Translation/Translator.html) class. No need to learn a whole API.
+ - Support Laravel **4.2** / **5.0** / **5.1** / **5.2** / **5.3**.
+ - Includes (optionally) [Lang.js](https://github.com/rmariuzzo/lang.js) (a thin library highly inspired on Laravel's [`Translator`](https://laravel.com/api/5.3/Illuminate/Translation/Translator.html) class).
+ - Allow to specify desired message files to be converted to JS.
+ - [Lang.js](https://github.com/rmariuzzo/lang.js) API is based on Laravel's [`Translator`](https://laravel.com/api/5.3/Illuminate/Translation/Translator.html) class. No need to learn a whole API.
 
 ## Installation
 
 ```shell
+# Using Composer
 composer require mariuzzo/laravel-js-localization
 ```
 
@@ -35,7 +36,16 @@ Mariuzzo\LaravelJsLocalization\LaravelJsLocalizationServiceProvider::class
 
 ## Usage
 
-The `Laravel-JS-Localization` package provides a command that generate the JavaScript version of all your messages found at: `app/lang` (Laravel 4) or `resources/lang` (Laravel 5) directory. The resulting JavaScript file will contains all your messages plus [Lang.js](https://github.com/rmariuzzo/lang.js) (a thin library highly inspired on Laravel's [`Translator`](https://laravel.com/api/5.3/Illuminate/Translation/Translator.html) class).
+The `Laravel-JS-Localization` package provides a command that generate the JavaScript version of all your messages found at: `app/lang` (Laravel 4) or `resources/lang` (Laravel 5) directory. The resulting JavaScript file will contains all your messages and optionally [Lang.js](https://github.com/rmariuzzo/lang.js).
+
+## Synopsis
+
+```shell
+php artisan lang:js [--compress]
+                    [--no-lib]
+                    [--source <file>]
+                    [<file>]
+```
 
 ### Generating JS messages
 
@@ -46,19 +56,31 @@ php artisan lang:js
 ### Specifying a custom target
 
 ```shell
-php artisan lang:js public/assets/dist/lang.dist.js
+php artisan lang:js public/assets/dist/messages.js
 ```
 
 ### Compressing the JS file
 
 ```shell
+php artisan lang:js --compress
+# Or
 php artisan lang:js -c
 ```
 
 ### Specifying a custom source folder
 
 ```shell
-php artisan lang:js public/assets/dist/lang.dist.js -s themes/default/lang
+php artisan lang:js --source themes/default/lang
+# Or
+php artisan lang:js -s themes/default/lang
+```
+
+### Excluding the lang.js
+
+```shell
+php artisan lang:js --no-lib
+# Or
+php artisan lang:js --nl
 ```
 
 ## Configuration

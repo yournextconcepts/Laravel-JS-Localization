@@ -52,6 +52,7 @@ class LangJsCommand extends Command
      */
     public function fire()
     {
+        // Get arguments and options.
         $target = $this->argument('target');
         $options = [
             'compress' => $this->option('compress'),
@@ -59,9 +60,9 @@ class LangJsCommand extends Command
             'source' => $this->option('source'),
         ];
 
+        // Generate messages.
         if ($this->generator->generate($target, $options)) {
             $this->info("Created: {$target}");
-
             return;
         }
 
@@ -75,19 +76,10 @@ class LangJsCommand extends Command
      */
     protected function getArguments()
     {
+        $defaultTarget = Config::get('localization-js.path', public_path('messages.js'));
         return [
-            ['target', InputArgument::OPTIONAL, 'Target path.', $this->getDefaultPath()],
+            ['target', InputArgument::OPTIONAL, 'Target path.', $defaultTarget],
         ];
-    }
-
-    /**
-     * Return the path to use when no path is specified.
-     *
-     * @return string
-     */
-    protected function getDefaultPath()
-    {
-        return Config::get('localization-js.path', public_path('messages.js'));
     }
 
     /**

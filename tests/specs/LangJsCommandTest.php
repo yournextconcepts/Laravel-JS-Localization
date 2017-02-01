@@ -58,7 +58,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
-     * Test the command.
+     * Assert the command can be run.
      */
     public function testShouldCommandRun()
     {
@@ -79,6 +79,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert template exist with handlebars.
      */
     public function testShouldTemplateHasHandlebars()
     {
@@ -92,6 +93,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert the command upon execution replaces handlebars with generated contents.
      */
     public function testShouldOutputHasNotHandlebars()
     {
@@ -113,6 +115,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert messages key ares included in the generated file.
      */
     public function testAllFilesShouldBeConverted()
     {
@@ -127,7 +130,7 @@ class LangJsCommandTest extends TestCase
 
         $contents = file_get_contents($this->outputFilePath);
         $this->assertContains('gm8ft2hrrlq1u6m54we9udi', $contents);
-        
+
         $this->assertNotContains('vendor.nonameinc.en.messages', $contents);
         $this->assertNotContains('vendor.nonameinc.es.messages', $contents);
         $this->assertNotContains('vendor.nonameinc.ht.messages', $contents);
@@ -142,6 +145,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert specified message source should be included in the generated file.
      */
     public function testFilesSelectedInConfigShouldBeConverted()
     {
@@ -162,6 +166,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert specified message shource can be in a nested directory.
      */
     public function testShouldIncludeNestedDirectoryFile()
     {
@@ -181,6 +186,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert that a custom target can be specified.
      */
     public function testShouldUseDefaultOutputPathFromConfig()
     {
@@ -204,6 +210,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     * Assert that target specified in command line has more importance than configuration file.
      */
     public function testShouldIgnoreDefaultOutputPathFromConfigIfTargetArgumentExist()
     {
@@ -227,22 +234,9 @@ class LangJsCommandTest extends TestCase
         $this->cleanupOutputDirectory();
     }
 
-    /*
-     * test template have handlebar { messages }
-     * */
-    public function testShouldTemplateMessagesHasHandlebars()
-    {
-        $template = "$this->rootPath/src/Mariuzzo/LaravelJsLocalization/Generators/Templates/messages.js";
-        $this->assertFileExists($template);
-
-        $contents = file_get_contents($template);
-        $this->assertNotEmpty($contents);
-        $this->assertHasHandlebars('messages', $contents);
-    }
-
-    /*
-     * test command with option --no-lib
-     * */
+    /**
+     * Assert exclusion of lang.js library.
+     */
     public function testShouldOnlyMessageExported()
     {
         $generator = new LangJsGenerator(new File(), $this->langPath);
@@ -260,6 +254,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
+     *
      */
     public function testChangeDefaultLangSourceFolder()
     {
@@ -304,7 +299,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
-     * Run the command.
+     * Run a command with optional input.
      *
      * @param \Illuminate\Console\Command $command
      * @param array                       $input
@@ -317,7 +312,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
-     * Assert the code return is success.
+     * Assert output code is successful.
      *
      * @param int  $code
      * @param null $message
@@ -328,8 +323,10 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
-     * @param string $handle
-     * @param string $contents
+     * Assert a handle exists in a text contents.
+     *
+     * @param string $handle   The handle.
+     * @param string $contents The text contents.
      */
     protected function assertHasHandlebars($handle, $contents)
     {
@@ -337,8 +334,10 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
-     * @param string $handle
-     * @param string $contents
+     * Assert a handle doesn't exists in a text contents.
+     *
+     * @param string $handle   The handle.
+     * @param string $contents The text contents.
      */
     protected function assertHasNotHandlebars($handle, $contents)
     {
@@ -346,7 +345,7 @@ class LangJsCommandTest extends TestCase
     }
 
     /**
-     * Cleanup output directory after tests.
+     * Cleanup output directory.
      */
     protected function cleanupOutputDirectory()
     {

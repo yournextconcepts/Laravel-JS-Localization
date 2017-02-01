@@ -47,7 +47,7 @@ class LangJsGenerator
     }
 
     /**
-     * Generate a JS lang file from all language files.
+     * Generate a JS lang file.
      *
      * @param string $target  The target directory.
      * @param array  $options Array of options.
@@ -63,6 +63,7 @@ class LangJsGenerator
         $messages = $this->getMessages();
         $this->prepareTarget($target);
 
+        // Inject lang.js if not excluded.
         if ($options['no-lib']) {
             $template = $this->file->get(__DIR__.'/Templates/messages.js');
         } else {
@@ -71,12 +72,15 @@ class LangJsGenerator
             $template = str_replace('\'{ langjs }\';', $langjs, $template);
         }
 
+        // Inject generated messages.
         $template = str_replace('\'{ messages }\'', json_encode($messages), $template);
 
+        // Compress generated contents.
         if ($options['compress']) {
             $template = Minifier::minify($template);
         }
 
+        // Write contents to file.
         return $this->file->put($target, $template);
     }
 
@@ -107,10 +111,13 @@ class LangJsGenerator
                 continue;
             }
 
+            // Remove the .php extension.
             $key = substr($pathName, 0, -4);
+
+            // Replace '/' and '\' from the path with '.'.
             $key = str_replace('\\', '.', $key);
             $key = str_replace('/', '.', $key);
-            
+
             if (starts_with($key, 'vendor')) {
                 $key = $this->getVendorKey($key);
             }
@@ -161,7 +168,12 @@ class LangJsGenerator
 
         return true;
     }
-    
+
+    /**
+     * Return a vendor key from a normal message key.
+     * @param  string $key The message key.
+     * @return string      The vendor message key.
+     */
     private function getVendorKey($key)
     {
         $keyParts = explode('.', $key, 4);

@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 /**
  * The LaravelJsLocalizationServiceProvider class.
  *
- * @author  Rubens Mariuzzo <rubens@mariuzzo.com>
+ * @author Rubens Mariuzzo <rubens@mariuzzo.com>
  */
 class LaravelJsLocalizationServiceProvider extends ServiceProvider
 {
