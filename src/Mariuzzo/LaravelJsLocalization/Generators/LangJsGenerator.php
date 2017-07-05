@@ -3,6 +3,7 @@
 namespace Mariuzzo\LaravelJsLocalization\Generators;
 
 use Illuminate\Filesystem\Filesystem as File;
+use Illuminate\Support\Arr;
 use JShrink\Minifier;
 
 /**
