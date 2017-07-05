@@ -143,8 +143,8 @@ class LangJsGenerator
 
             // translate all strings based on the set locale
             $translatedStrings = [];
-            foreach($translationKeys as $key) {
-                $translatedStrings[$key] = trans($prefix.'.'.$key, [], $locale);
+            foreach($translationKeys as $k) {
+                $translatedStrings[$k] = trans($prefix.'.'.$k, [], $locale);
             }
 
             $messages[$key] = $translatedStrings;
