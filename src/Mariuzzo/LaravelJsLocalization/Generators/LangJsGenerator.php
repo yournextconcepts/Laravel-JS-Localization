@@ -123,15 +123,30 @@ class LangJsGenerator
                 continue;
             }
 
+            $prefix = substr($file->getFileName(), 0, -4);
+
             $key = substr($pathName, 0, -4);
             $key = str_replace('\\', '.', $key);
             $key = str_replace('/', '.', $key);
-            
+
             if (starts_with($key, 'vendor')) {
                 $key = $this->getVendorKey($key);
             }
 
-            $messages[$key] = include $path . DIRECTORY_SEPARATOR . $pathName;
+            // set the locale based on the filename
+            $locale = explode('.', $key)[0];
+
+            // load the original strings from file and convert to dot notation
+            $originalStrings = include $path . DIRECTORY_SEPARATOR . $pathName;
+            $translationKeys = array_keys(Arr::dot($originalStrings));
+
+            // translate all strings based on the set locale
+            $translatedStrings = [];
+            foreach($translationKeys as $key) {
+                $translatedStrings[$key] = trans($prefix.'.'.$key, [], $locale);
+            }
+
+            $messages[$key] = $translatedStrings;
         }
 
         $this->sortMessages($messages);
@@ -179,7 +194,7 @@ class LangJsGenerator
 
         return true;
     }
-    
+
     private function getVendorKey($key)
     {
         $keyParts = explode('.', $key, 4);
