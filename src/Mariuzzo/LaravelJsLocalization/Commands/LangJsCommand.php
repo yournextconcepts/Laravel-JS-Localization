@@ -50,7 +50,7 @@ class LangJsCommand extends Command
     /**
      * Fire the command. (Compatibility for < 5.0)
      */
-    public function fire()
+    public function handle()
     {
         $this->handle();
     }
