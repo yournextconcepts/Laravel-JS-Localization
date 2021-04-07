@@ -2,8 +2,10 @@
 
 namespace Mariuzzo\LaravelJsLocalization\Generators;
 
+use InvalidArgumentException;
 use Illuminate\Filesystem\Filesystem as File;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use JShrink\Minifier;
 
 /**
@@ -35,6 +37,14 @@ class LangJsGenerator
     protected $messagesIncluded = [];
 
     /**
+     * Name of the domain in which all string-translation should be stored under.
+     * More about string-translation: https://laravel.com/docs/master/localization#retrieving-translation-strings
+     *
+     * @var string
+     */
+    protected $stringsDomain = 'strings';
+
+    /**
      * Construct a new LangJsGenerator instance.
      *
      * @param File   $file       The file service instance.
@@ -61,11 +71,13 @@ class LangJsGenerator
             $this->sourcePath = $options['source'];
         }
 
-        $messages = $this->getMessages();
+        $messages = $this->getMessages($options['no-sort']);
         $this->prepareTarget($target);
 
         if ($options['no-lib']) {
             $template = $this->file->get(__DIR__.'/Templates/messages.js');
+        } else if ($options['json']) {
+            $template = $this->file->get(__DIR__.'/Templates/messages.json');
         } else {
             $template = $this->file->get(__DIR__.'/Templates/langjs_with_messages.js');
             $langjs = $this->file->get(__DIR__.'/../../../../lib/lang.min.js');
@@ -100,11 +112,12 @@ class LangJsGenerator
     /**
      * Return all language messages.
      *
+     * @param bool $noSort Whether sorting of the messages should be skipped.
      * @return array
      *
      * @throws \Exception
      */
-    protected function getMessages()
+    protected function getMessages($noSort)
     {
         $messages = [];
         $path = $this->sourcePath;
@@ -115,8 +128,8 @@ class LangJsGenerator
 
         foreach ($this->file->allFiles($path) as $file) {
             $pathName = $file->getRelativePathName();
-
-            if ($this->file->extension($pathName) !== 'php') {
+            $extension = $this->file->extension($pathName);
+            if ($extension != 'php' && $extension != 'json') {
                 continue;
             }
 
@@ -130,27 +143,41 @@ class LangJsGenerator
             $key = str_replace('\\', '.', $key);
             $key = str_replace('/', '.', $key);
 
-            if (starts_with($key, 'vendor')) {
+            if (Str::startsWith($key, 'vendor')) {
                 $key = $this->getVendorKey($key);
             }
 
-            // set the locale based on the filename
-            $locale = explode('.', $key)[0];
+            $fullPath = $path.DIRECTORY_SEPARATOR.$pathName;
+            if ($extension == 'php') {
+                // set the locale based on the filename
+                $locale = explode('.', $key)[0];
 
-            // load the original strings from file and convert to dot notation
-            $originalStrings = include $path . DIRECTORY_SEPARATOR . $pathName;
-            $translationKeys = array_keys(Arr::dot($originalStrings));
+                // load the original strings from file and convert to dot notation
+                $originalStrings = include $path . DIRECTORY_SEPARATOR . $pathName;
+                $translationKeys = array_keys(Arr::dot($originalStrings));
 
-            // translate all strings based on the set locale
-            $translatedStrings = [];
-            foreach($translationKeys as $k) {
-                $translatedStrings = Arr::add($translatedStrings, $k, trans($prefix.'.'.$k, [], $locale));
+                // translate all strings based on the set locale
+                $translatedStrings = [];
+                foreach($translationKeys as $k) {
+                    $translatedStrings = Arr::add($translatedStrings, $k, trans($prefix.'.'.$k, [], $locale));
+                }
+
+                $messages[$key] = $translatedStrings;
+            } else {
+                $key = $key.$this->stringsDomain;
+                $fileContent = file_get_contents($fullPath);
+                $messages[$key] = json_decode($fileContent, true);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new InvalidArgumentException('Error while decode ' . basename($fullPath) . ': ' . json_last_error_msg());
+                }
             }
-
-            $messages[$key] = $translatedStrings;
         }
 
-        $this->sortMessages($messages);
+        if (!$noSort)
+        {
+            $this->sortMessages($messages);
+        }
 
         return $messages;
     }
@@ -165,7 +192,7 @@ class LangJsGenerator
         $dirname = dirname($target);
 
         if (!$this->file->exists($dirname)) {
-            $this->file->makeDirectory($dirname, null, true);
+            $this->file->makeDirectory($dirname, 0755, true);
         }
     }
 
